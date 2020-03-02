@@ -89,6 +89,7 @@ public class AtmosSimulation : IDisposable
     private ChunkedGrid<AtmosCell> nextState;
 
     private Queue<ICommand> commandsBuffer = new Queue<ICommand>();
+    private JobHandle lastJob;
 
     public void AddCommand(ICommand command)
     {
@@ -103,6 +104,8 @@ public class AtmosSimulation : IDisposable
 
     public void Dispose()
     {
+        lastJob.Complete();
+
         currentState.Dispose();
         nextState.Dispose();
     }
@@ -136,7 +139,7 @@ public class AtmosSimulation : IDisposable
         var currentChunks = currentState.Chunks.ToArray();
         var nextChunks = nextState.Chunks.ToArray();
 
-        JobHandle lastJob = default;
+        lastJob = default(JobHandle);
 
         for (int i = 0; i < currentChunks.Length; i++)
         {
