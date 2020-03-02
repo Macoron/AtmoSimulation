@@ -84,6 +84,8 @@ public class AtmosSimulation : IDisposable
 {
     public ChunkedGrid<AtmosCell> currentState;
 
+    public long lastSimulationFrame;
+
     private ChunkedGrid<AtmosCell> nextState;
 
     private Queue<ICommand> commandsBuffer = new Queue<ICommand>();
@@ -147,6 +149,7 @@ public class AtmosSimulation : IDisposable
         }
 
         // calculate total pressure
+        // for validation only
         /*var validationJob = new CalculateTotalPressureJob()
         {
             grid = nextState
@@ -159,6 +162,7 @@ public class AtmosSimulation : IDisposable
 
         sw.Stop();
 
+        lastSimulationFrame = sw.ElapsedMilliseconds;
         UnityEngine.Debug.Log($"One step time: {sw.ElapsedMilliseconds} ms");
 
         // swap the buffers

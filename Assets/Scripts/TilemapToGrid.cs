@@ -17,7 +17,7 @@ public class TilemapToGrid : MonoBehaviour
     public int chunkSize = 3;
     public int viewRadius = 5;
 
-    private AtmosSimulation simulation;
+    public AtmosSimulation simulation;
 
     // Start is called before the first frame update
     void Start()
