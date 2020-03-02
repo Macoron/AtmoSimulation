@@ -35,21 +35,42 @@ public class TilemapToGrid : MonoBehaviour
 
     private void HandleInput()
     {
+        var mouseClickPos = Input.mousePosition;
+        var worldPos = Camera.main.ScreenToWorldPoint(mouseClickPos);
+
+        var gridPos = tilemapVisual.WorldToCell(worldPos);
+        var grid = simulation.currentState;
+
+        // Don't allow add new chunks 
+        if (!grid.HasCell(gridPos.x, gridPos.y))
+            return;
+
         if (Input.GetMouseButtonDown(0))
         {
-            var mouseClickPos = Input.mousePosition;
-            var worldPos = Camera.main.ScreenToWorldPoint(mouseClickPos);
-
-            var gridPos = tilemapVisual.WorldToCell(worldPos);
-            var grid = simulation.currentState;
-            if (grid.HasCell(gridPos.x, gridPos.y))
+            simulation.AddCommand(new AddGasCommand()
             {
-                simulation.AddCommand(new AddGasCommand()
+                ammount = 100,
+                pos = new int2(gridPos.x, gridPos.y)
+            });
+        }
+        else if (Input.GetMouseButtonDown(1))
+        {
+            if (grid[gridPos.x, gridPos.y].isWall)
+            {
+                simulation.AddCommand(new RemoveWallCommand()
                 {
-                    ammount = 100,
                     pos = new int2(gridPos.x, gridPos.y)
                 });
             }
+            else
+            {
+                simulation.AddCommand(new AddWallCommand()
+                {
+                    pos = new int2(gridPos.x, gridPos.y)
+                });
+            }
+
+
         }
     }
 
@@ -86,6 +107,7 @@ public class TilemapToGrid : MonoBehaviour
                     {
 
                         tilemapVisual.SetTile(cellPos, wallTile);
+                        tilemapVisual.SetColor(cellPos, wallTile.color);
                     }
 
 

@@ -48,7 +48,7 @@ Tilemap:
       m_TileMatrixIndex: 0
       m_TileColorIndex: 1
       m_ObjectToInstantiate: {fileID: 0}
-      m_TileFlags: 1
+      m_TileFlags: 0
       m_ColliderType: 1
   - first: {x: -2, y: -1, z: 0}
     second:
@@ -57,7 +57,7 @@ Tilemap:
       m_TileMatrixIndex: 0
       m_TileColorIndex: 0
       m_ObjectToInstantiate: {fileID: 0}
-      m_TileFlags: 1
+      m_TileFlags: 0
       m_ColliderType: 1
   - first: {x: -1, y: -1, z: 0}
     second:
@@ -66,7 +66,7 @@ Tilemap:
       m_TileMatrixIndex: 0
       m_TileColorIndex: 2
       m_ObjectToInstantiate: {fileID: 0}
-      m_TileFlags: 1
+      m_TileFlags: 0
       m_ColliderType: 1
   m_AnimatedTiles: {}
   m_TileAssetArray:
@@ -104,7 +104,7 @@ Tilemap:
   - m_RefCount: 1
     m_Data: {r: 0.39279994, g: 0.70266694, b: 0.8584906, a: 1}
   - m_RefCount: 1
-    m_Data: {r: 0.3490566, g: 0.3490566, b: 0.3490566, a: 1}
+    m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_AnimationFrameRate: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Origin: {x: -3, y: -1, z: 0}
