@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.UI;
 
 public class TilemapToGrid : MonoBehaviour
 {
@@ -18,6 +19,7 @@ public class TilemapToGrid : MonoBehaviour
     public int viewRadius = 5;
 
     public AtmosSimulation simulation;
+    public PressureVisualisation visualisation;
 
     // Start is called before the first frame update
     void Start()
@@ -81,6 +83,8 @@ public class TilemapToGrid : MonoBehaviour
 
         var grid = simulation.currentState;
 
+        visualisation?.HideAll();
+
         for (int x = -viewRadius; x <= viewRadius; x++)
             for (int y = -viewRadius; y <= viewRadius; y++)
             {
@@ -96,12 +100,14 @@ public class TilemapToGrid : MonoBehaviour
                     {
                         var pressure = cell.pressure;
 
-
                         var normPressure = Mathf.Clamp01(pressure / maxPressure);
                         var color = gradient.Evaluate(normPressure);
 
                         tilemapVisual.SetTile(cellPos, airTile);
                         tilemapVisual.SetColor(cellPos, color);
+
+                        var worldPos = tilemapVisual.GetCellCenterWorld(cellPos);
+                        visualisation?.ShowPressure(worldPos, pressure);
                     }
                     else
                     {
@@ -117,60 +123,35 @@ public class TilemapToGrid : MonoBehaviour
             }
     }
 
-#if UNITY_EDITOR
-    private void OnDrawGizmos()
-    {
-        if (!Application.isPlaying)
-            return;
+    /*#if UNITY_EDITOR
+      private void OnDrawGizmos()
+       {
+           if (!Application.isPlaying)
+               return;
 
-        var camera = Camera.main.transform;
-        var cameraCenter = tilemapVisual.WorldToCell(camera.position);
+           var camera = Camera.main.transform;
+           var cameraCenter = tilemapVisual.WorldToCell(camera.position);
 
-        var grid = simulation.currentState;
+           var grid = simulation.currentState;
 
-        for (int x = -viewRadius; x <= viewRadius; x++)
-            for (int y = -viewRadius; y <= viewRadius; y++)
-            {
-                int posX = cameraCenter.x + x;
-                int posY = cameraCenter.y + y;
+           for (int x = -viewRadius; x <= viewRadius; x++)
+               for (int y = -viewRadius; y <= viewRadius; y++)
+               {
+                   int posX = cameraCenter.x + x;
+                   int posY = cameraCenter.y + y;
 
-                if (grid.HasCell(posX, posY))
-                {
-                    var pressure = grid[posX, posY].pressure;
-                    var cellPos = new Vector3Int(posX, posY, 0);
-                    var worldPos = tilemapVisual.GetCellCenterWorld(cellPos);
+                   if (grid.HasCell(posX, posY))
+                   {
+                       var pressure = grid[posX, posY].pressure;
+                       var cellPos = new Vector3Int(posX, posY, 0);
+                       var worldPos = tilemapVisual.GetCellCenterWorld(cellPos);
 
-                    UnityEditor.Handles.Label(worldPos, pressure.ToString("n2"));
-                }
+                       UnityEditor.Handles.Label(worldPos, pressure.ToString("n2"));
+                   }
 
-            }
-
-        /*foreach (var chunk in simulation.currentState.Chunks)
-        {
-            var minPos = chunk.MinPoint;
-            var maxPos = chunk.MaxPoint;
-
-            for (int x = minPos.x; x <= maxPos.x; x++)
-                for (int y = minPos.y; y <= maxPos.y; y++)
-                {
-                    var cell = chunk[x, y];
-
-                    var pos = new Vector3Int(x, y, 0);
-                    var worldPos = tilemapVisual.GetCellCenterWorld(pos);
-                    UnityEditor.Handles.Label(worldPos, cell.pressure.ToString("n2"));
-                }
-        }*/
-
-        /*foreach (AtmosCell cell in simulation.currentState)
-        {
-            var pos = new Vector3Int(cell.cellPos.x, cell.cellPos.y, 0);
-            var worldPos = tilemapVisual.GetCellCenterWorld(pos);
-
-            UnityEditor.Handles.Label(worldPos, cell.pressure.ToString());
-
-        }*/
-    }
-#endif
+               }
+       }
+    #endif*/
 
     private void OnDestroy()
     {
