@@ -50,7 +50,7 @@ public struct ChunkedGrid<T> : IDisposable, IEnumerable<T>
             this.chunkPos = chunkPos;
         }
 
-        public T this[int x, int y]
+        /*public T this[int x, int y]
         {
             get
             {
@@ -62,7 +62,7 @@ public struct ChunkedGrid<T> : IDisposable, IEnumerable<T>
                 var cellIndex = grid.GetCellIndex(x, y, chunkPos);
                 grid.buffer[cellIndex] = value;
             }
-        }
+        }*/
     }
 
     public ChunkedGrid(int chunkSize, int cellsCapacity)
