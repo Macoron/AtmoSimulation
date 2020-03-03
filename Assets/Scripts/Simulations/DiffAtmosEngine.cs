@@ -69,11 +69,11 @@ public struct EqualisationJob : IJob
 
                     var otherPos = cell.Item1;
                     currentState.grid[otherPos.x, otherPos.y] = otherCell;
-                }
 
-                // Apply changed pressure
-                myCell.pressure = myPressure;
-                currentState.grid[x, y] = myCell;
+                    // Apply changed pressure
+                    myCell.pressure = myPressure;
+                    currentState.grid[x, y] = myCell;
+                }
             }
 
         /*                         {
@@ -125,6 +125,10 @@ public class DiffAtmosEngine : IAtmosEngine
 
         while (!lastJob.IsCompleted)
             yield return null;
+
+        /*var temp = sim.currentState;
+        sim.currentState = sim.nextState;
+        sim.nextState = temp;*/
 
     }
 }
