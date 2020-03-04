@@ -9,86 +9,96 @@ using UnityEngine;
 public struct EqualisationJob : IJob
 {
     // read and write
-    public ChunkedGrid<AtmosCell>.Chunk currentState;
+    public ChunkedGrid<AtmosCell>.Chunk nextState;
+
+    private (float, List<WindDirection>) CalculateMeanPressure(int2[] neighbourCells, float myPressure)
+    {
+        var sumPressure = myPressure;
+        var windDirection = new List<WindDirection>(4);
+
+        // Only sum neighbors that has smaller pressure
+        for (int i = 0; i < neighbourCells.Length; i++)
+        {
+            var pos = neighbourCells[i];
+
+            if (nextState.grid.HasCell(pos.x, pos.y))
+            {
+                var otherCell = nextState.grid[pos.x, pos.y];
+                if (otherCell.isWall)
+                    continue;
+
+                var otherPressure = otherCell.pressure;
+
+                if (myPressure > otherPressure)
+                {
+                    sumPressure += otherCell.pressure;
+                    windDirection.Add((WindDirection)i);
+                }
+            }
+        }
+
+        var meanPressure = sumPressure / (windDirection.Count + 1);
+        return (meanPressure, windDirection);
+    }
 
     public void Execute()
     {
-        var minPos = currentState.MinPoint;
-        var maxPos = currentState.MaxPoint;
+        var minPos = nextState.MinPoint;
+        var maxPos = nextState.MaxPoint;
+
+        var allCells = new List<int2>();
 
         for (int x = minPos.x; x <= maxPos.x; x++)
             for (int y = minPos.y; y <= maxPos.y; y++)
+                allCells.Add(new int2(x, y));
+
+        var random = new Unity.Mathematics.Random((uint)DateTime.Now.Ticks);
+        var randomOrder = allCells.OrderBy((c) => random.NextInt());
+
+        foreach (var cell in randomOrder)
+        {
+            var x = cell.x;
+            var y = cell.y;
+
+            var neighbourCells = new int2[]{
+                new int2(x - 1, y),
+                new int2(x + 1, y),
+                new int2(x, y + 1),
+                new int2(x, y - 1)
+            };
+
+            var myCell = nextState.grid[x, y];
+            var myPressure = nextState.grid[x, y].pressure;
+
+            myCell.ClearAllWind();
+
+            // First calculate where wind can move pressure
+            var windCalculation = CalculateMeanPressure(neighbourCells, myPressure);
+            var meanPressure = windCalculation.Item1;
+            var windDirections = windCalculation.Item2;
+
+
+            // Share myCell pressure with them
+            foreach (var dir in windDirections)
             {
-                // Fixed order cause different behaviour on corners cells
-                // Should I use some sorting?
-                var neighbourCells = new int2[]{
-                    new int2(x - 1, y),
-                    new int2(x + 1, y),
-                    new int2(x, y - 1),
-                    new int2(x, y + 1)
-                };
+                var otherPos = neighbourCells[(int)dir];
+                var otherCell = nextState.grid[otherPos.x, otherPos.y];
 
-                var myCell = currentState.grid[x, y];
-                var myPressure = currentState.grid[x, y].pressure;
+                var dif = meanPressure - otherCell.pressure;
+                if (myPressure - dif < 0)
+                    break;
 
-                var meanPressure = myPressure;
-                var smallerPressure = new List<(int2, AtmosCell)>(4);
-                // Get neighbors that has smaller pressure
-                foreach (var pos in neighbourCells)
-                {
-                    if (currentState.grid.HasCell(pos.x, pos.y))
-                    {
-                        var otherCell = currentState.grid[pos.x, pos.y];
-                        if (otherCell.isWall)
-                            continue;
+                myPressure -= dif;
+                otherCell.pressure += dif;
+                myCell.AddWind(dir, dif);
 
-                        var otherPressure = otherCell.pressure;
+                nextState.grid[otherPos.x, otherPos.y] = otherCell;
 
-                        if (myPressure > otherPressure)
-                        {
-                            smallerPressure.Add((pos, otherCell));
-                            meanPressure += otherCell.pressure;
-                        }
-                    }
-                }
-
-                // Sort cells by their pressure
-                smallerPressure = smallerPressure.OrderBy((cell) => { return cell.Item2.pressure; }).ToList();
-                meanPressure /= (smallerPressure.Count + 1);
-
-                // Share myCell pressure with them
-                foreach (var cell in smallerPressure)
-                {
-                    var otherCell = cell.Item2;
-
-                    var dif = meanPressure - otherCell.pressure;
-                    if (myPressure - dif < 0)
-                        break;
-
-                    myPressure -= dif;
-                    otherCell.pressure += dif;
-
-                    var otherPos = cell.Item1;
-                    currentState.grid[otherPos.x, otherPos.y] = otherCell;
-
-                    // Apply changed pressure
-                    myCell.pressure = myPressure;
-                    currentState.grid[x, y] = myCell;
-                }
+                // Apply changed pressure
+                myCell.pressure = myPressure;
+                nextState.grid[x, y] = myCell;
             }
-
-        /*                         {
-                            var meanPressure = (myPressure + otherPressure) / 2f;
-                            var step = myPressure - meanPressure;
-
-                            myPressure -= step;
-                            otherCell.pressure += step;
-
-                            currentState.grid[pos.x, pos.y] = otherCell;
-
-                            myCell.pressure = myPressure;
-                            currentState.grid[x, y] = myCell;
-                        }*/
+        }
     }
 }
 
@@ -112,7 +122,7 @@ public class DiffAtmosEngine : IAtmosEngine
         {
             var job = new EqualisationJob()
             {
-                currentState = currentChunks[i]
+                nextState = currentChunks[i]
             };
 
             lastJob = job.Schedule(lastJob);

@@ -31,7 +31,7 @@ public class AtmosSimulation : IDisposable
     public ChunkedGrid<AtmosCell> currentState;
     public ChunkedGrid<AtmosCell> nextState;
 
-    public IAtmosEngine atmosEngine = new WindEngine();
+    public IAtmosEngine atmosEngine = new DiffAtmosEngine();
 
     public long lastSimulationFrame;
 
