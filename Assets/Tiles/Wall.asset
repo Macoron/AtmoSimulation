@@ -32,7 +32,7 @@ MonoBehaviour:
     e32: 0
     e33: 1
   m_InstancedGameObject: {fileID: 0}
-  m_Flags: 0
+  m_Flags: 1
   m_ColliderType: 1
   pressure: 0
   isWall: 1

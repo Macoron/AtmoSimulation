@@ -14,13 +14,21 @@ public unsafe struct AtmosCell
 {
     public bool isWall;
     public float pressure;
-    public fixed float wind[4];
+    private fixed float wind[4];
 
     public void AddWind(WindDirection dir, float ammount)
     {
         unsafe
         {
             wind[(int)dir] = ammount;
+        }
+    }
+
+    public float GetWind(WindDirection dir)
+    {
+        unsafe
+        {
+            return wind[(int)dir];
         }
     }
 

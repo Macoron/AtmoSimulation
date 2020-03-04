@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class WindEngine : IAtmosEngine
 {
-    private List<JobHandle> windJobs;
+    private List<JobHandle> windJobs = new List<JobHandle>();
 
     public void Dispose()
     {
@@ -20,7 +20,7 @@ public class WindEngine : IAtmosEngine
         var nextChunks = sim.nextState.Chunks.ToArray();
 
         // First generate wind map
-        windJobs = new List<JobHandle>();
+        windJobs.Clear();
         for (int i = 0; i < currentChunks.Length; i++)
         {
             var job = new WindJob()

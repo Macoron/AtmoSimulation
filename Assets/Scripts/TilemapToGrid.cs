@@ -19,7 +19,10 @@ public class TilemapToGrid : MonoBehaviour
     public int viewRadius = 5;
 
     public AtmosSimulation simulation;
+
+    [Header("Visualisation Helper")]
     public PressureVisualisation visualisation;
+    public WindVisualisation windVisualisation;
 
     // Start is called before the first frame update
     void Start()
@@ -84,6 +87,7 @@ public class TilemapToGrid : MonoBehaviour
         var grid = simulation.currentState;
 
         visualisation?.HideAll();
+        windVisualisation?.HideAll();
 
         for (int x = -viewRadius; x <= viewRadius; x++)
             for (int y = -viewRadius; y <= viewRadius; y++)
@@ -108,6 +112,16 @@ public class TilemapToGrid : MonoBehaviour
 
                         var worldPos = tilemapVisual.GetCellCenterWorld(cellPos);
                         visualisation?.ShowPressure(worldPos, pressure);
+                        if (windVisualisation)
+                        {
+                            for (int i = 0; i < 4; i++)
+                            {
+                                var windDir = (WindDirection)i;
+
+                                var windPower = cell.GetWind(windDir);
+                                windVisualisation.ShowWind(worldPos, windPower, windDir);
+                            }
+                        }
                     }
                     else
                     {
