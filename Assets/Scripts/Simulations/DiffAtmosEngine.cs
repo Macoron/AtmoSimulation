@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Jobs;
@@ -107,7 +108,6 @@ public class DiffAtmosEngine : IAtmosEngine
 
         lastJob = default(JobHandle);
 
-        // wait while all works are finished
         for (int i = 0; i < currentChunks.Length; i++)
         {
             var job = new EqualisationJob()
