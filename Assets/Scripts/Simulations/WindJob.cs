@@ -86,6 +86,9 @@ public struct WindJob : IJob
                 var otherCell = currentState.grid[pos.x, pos.y];
 
                 var windPower = meanPressure - otherCell.pressure;
+                if (windPower < 0)
+                    continue;
+
                 if (myPressure - windPower < 0)
                     break;
 
