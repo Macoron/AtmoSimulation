@@ -29,6 +29,9 @@ public class PressureVisualisation : MonoBehaviour
 
     public void ShowPressure(Vector3 worldPos, float pressure)
     {
+        if (!gameObject.activeInHierarchy)
+            return;
+
         TextMesh pressureUI;
 
         if (pool.Count == 0)

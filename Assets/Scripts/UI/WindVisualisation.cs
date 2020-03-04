@@ -27,6 +27,9 @@ public class WindVisualisation : MonoBehaviour
 
     public void ShowWind(Vector3 worldPos, float power, WindDirection dir)
     {
+        if (!gameObject.activeInHierarchy)
+            return;
+
         if (power <= 0)
             return;
 
