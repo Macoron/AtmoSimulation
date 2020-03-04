@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class WindVisualisation : MonoBehaviour
 {
+    public float windThr = 30f;
     public SpriteRenderer windArrowPrefab;
 
     private Stack<SpriteRenderer> pool = new Stack<SpriteRenderer>();
@@ -30,7 +31,7 @@ public class WindVisualisation : MonoBehaviour
         if (!gameObject.activeInHierarchy)
             return;
 
-        if (power <= 0)
+        if (power <= windThr)
             return;
 
         SpriteRenderer windUI;

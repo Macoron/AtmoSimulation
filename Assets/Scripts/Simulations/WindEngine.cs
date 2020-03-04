@@ -7,6 +7,7 @@ using UnityEngine;
 public class WindEngine : IAtmosEngine
 {
     private List<JobHandle> windJobs = new List<JobHandle>();
+    private List<JobHandle> applyWindJobs = new List<JobHandle>();
 
     public void Dispose()
     {
@@ -36,6 +37,29 @@ public class WindEngine : IAtmosEngine
         // Wait until wind jobs finished
         while (windJobs.Count((j) => !j.IsCompleted) > 0)
             yield return null;
+
+        // Now apply wind
+        applyWindJobs.Clear();
+        for (int i = 0; i < currentChunks.Length; i++)
+        {
+            var job = new ApplyWindJob()
+            {
+                currentState = currentChunks[i],
+                nextState = nextChunks[i]
+            };
+
+            var jobHandle = job.Schedule();
+            applyWindJobs.Add(jobHandle);
+        }
+
+        // Wait until apply jobs finished
+        while (applyWindJobs.Count((j) => !j.IsCompleted) > 0)
+            yield return null;
+
+        /*new CalculateTotalPressureJob()
+        {
+            grid = sim.currentState
+        }.Execute();*/
 
         // Swap the buffer
         var temp = sim.currentState;

@@ -53,7 +53,7 @@ public struct WindJob : IJob
             }
         }
 
-        var meanPressure = sumPressure / windDirection.Count;
+        var meanPressure = sumPressure / (windDirection.Count + 1);
         return (meanPressure, windDirection);
     }
 
@@ -92,6 +92,8 @@ public struct WindJob : IJob
                 myCell.AddWind(windDir, windPower);
                 myPressure -= windPower;
             }
+
+            myCell.pressure = myPressure;
         }
 
         // Apply changes the future state
