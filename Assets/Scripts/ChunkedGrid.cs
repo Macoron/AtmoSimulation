@@ -19,7 +19,7 @@ public struct ChunkedGrid<T> : IDisposable, IEnumerable<T>
 
     private int lastChunkIndex;
 
-    public int CellsCount => lastChunkIndex + 1;
+    public int CellsCount => lastChunkIndex;
 
     public struct Chunk
     {
@@ -145,8 +145,8 @@ public struct ChunkedGrid<T> : IDisposable, IEnumerable<T>
 
     public int2 GetCellChunk(int x, int y)
     {
-        var chunkX = x >= 0 ? x / chunkSize : x / (chunkSize + 1) - 1;
-        var chunkY = y >= 0 ? y / chunkSize : y / (chunkSize + 1) - 1;
+        var chunkX = x >= 0 ? x / chunkSize : (x + 1) / chunkSize - 1;
+        var chunkY = y >= 0 ? y / chunkSize : (y + 1) / chunkSize - 1;
         return new int2(chunkX, chunkY);
     }
 
@@ -160,8 +160,8 @@ public struct ChunkedGrid<T> : IDisposable, IEnumerable<T>
     {
         var chunkIndex = hashMap[cellChunk];
 
-        int localX = x % chunkSize;
-        int localY = y % chunkSize;
+        int localX = x >= 0 ? x % chunkSize : (x + 1) % chunkSize;
+        int localY = y >= 0 ? y % chunkSize : (y + 1) % chunkSize;
 
         int cellIndex = Math.Abs(localX) + Math.Abs(localY * chunkSize);
         return chunkIndex + cellIndex;
