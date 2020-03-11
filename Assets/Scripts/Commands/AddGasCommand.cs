@@ -10,8 +10,20 @@ public class AddGasCommand : ICommand
 
     public void Execute(AtmosSimulation simulation)
     {
-        var cell = simulation.currentState[pos.x, pos.y];
-        cell.pressure += ammount;
-        simulation.currentState[pos.x, pos.y] = cell;
+        var grid = simulation.currentState;
+        if (!grid.HasCell(pos.x, pos.y))
+        {
+            var newCell = new AtmosCell() { isWall = false, pressure = ammount };
+            grid.AddCell(pos.x, pos.y, newCell);
+            simulation.currentState = grid;
+        }
+        else
+        {
+            var cell = simulation.currentState[pos.x, pos.y];
+            cell.pressure += ammount;
+            simulation.currentState[pos.x, pos.y] = cell;
+        }
+
+
     }
 }

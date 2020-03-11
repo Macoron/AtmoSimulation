@@ -100,6 +100,18 @@ public struct ChunkedGrid<T> : IDisposable, IEnumerable<T>
 
     }
 
+    public T this[int index]
+    {
+        get
+        {
+            return buffer[index];
+        }
+        set
+        {
+            buffer[index] = value;
+        }
+    }
+
     public T this[int x, int y]
     {
         get

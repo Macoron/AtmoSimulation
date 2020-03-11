@@ -46,10 +46,7 @@ public class TilemapToGrid : MonoBehaviour
         var gridPos = tilemapVisual.WorldToCell(worldPos);
         var grid = simulation.currentState;
 
-        // Don't allow add new chunks 
-        if (!grid.HasCell(gridPos.x, gridPos.y))
-            return;
-
+        // Need to add new cell first
         if (Input.GetMouseButtonDown(0))
         {
             simulation.AddCommand(new AddGasCommand()
@@ -60,7 +57,8 @@ public class TilemapToGrid : MonoBehaviour
         }
         else if (Input.GetMouseButtonDown(1))
         {
-            if (grid[gridPos.x, gridPos.y].isWall)
+            if (grid.HasCell(gridPos.x, gridPos.y) 
+                && grid[gridPos.x, gridPos.y].isWall)
             {
                 simulation.AddCommand(new RemoveWallCommand()
                 {

@@ -116,6 +116,11 @@ public class DiffAtmosEngine : IAtmosEngine
         var currentChunks = sim.currentState.Chunks.ToArray();
         var nextChunks = sim.nextState.Chunks.ToArray();
 
+        /*var copyJob = new CopyJob()
+        {
+            currentState = sim.currentState,
+            nextState = sim.nextState
+        }*/
         lastJob = default(JobHandle);
 
         for (int i = 0; i < currentChunks.Length; i++)
@@ -128,10 +133,10 @@ public class DiffAtmosEngine : IAtmosEngine
             lastJob = job.Schedule(lastJob);
         }
 
-        lastJob = new CalculateTotalPressureJob()
+        /*lastJob = new CalculateTotalPressureJob()
         {
             grid = sim.currentState
-        }.Schedule(lastJob);
+        }.Schedule(lastJob);*/
 
         while (!lastJob.IsCompleted)
             yield return null;
